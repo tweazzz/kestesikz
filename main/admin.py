@@ -60,7 +60,7 @@ class KruzhokAdmin(admin.ModelAdmin):
 
 admin.site.register(Kruzhok, KruzhokAdmin)
 
-admin.site.register(Facultative)
+admin.site.register(DopUrok)
 admin.site.register(TeacherWorkload)
 admin.site.register(Sport_Success)
 admin.site.register(Oner_Success)
@@ -68,3 +68,5 @@ admin.site.register(PandikOlimpiada_Success)
 admin.site.register(RedCertificate)
 admin.site.register(AltynBelgi)
 admin.site.register(School_SocialMedia)
+admin.site.register(Ring)
+admin.site.register(DopUrokRing)

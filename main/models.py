@@ -21,6 +21,17 @@ class School(models.Model):
     url = models.CharField('url', max_length=255)
     city = models.CharField('city', max_length=255)
     logo = models.ImageField(blank=True, null=True)
+    GMT_5 = 'GMT+5'
+    GMT_6 = 'GMT+6'
+    timezone_choices = [
+        (GMT_5, 'GMT+5'),
+        (GMT_6, 'GMT+6'),
+    ]
+    timezone = models.CharField(
+        max_length=20,
+        choices=timezone_choices,
+        default=GMT_5,
+    )
     user = models.ForeignKey('Admin', on_delete=models.CASCADE, null=True, related_name='Admins')
 
     class Meta:
@@ -40,15 +51,40 @@ class Classrooms(models.Model):
         verbose_name_plural = 'Classrooms'
 
     def __str__(self):
-        return f'{self.classroom_name}'
+        return f'{self.classroom_name}' 
     
 class Teacher(models.Model):
     full_name = models.CharField(max_length=250)
     photo3x4 = models.ImageField(null=True, blank=True)
     school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
-    classl = models.OneToOneField('Class', on_delete=models.SET_NULL, null=True, blank=True, related_name="teacher")
-    subject = models.ForeignKey('Subject', on_delete=models.CASCADE, null=True)
-    short_info = models.TextField()
+    subject = models.CharField(max_length=250, null=True)
+    pedagog_sheber = 'Pedagog Sheber'
+    pedagog_zertteushy = 'Pedagog  Zertteushy'
+    pedagog_sarapshy = 'Pedagog Sarapshy'
+    pedagog_moderator = 'Pedagog Moderator'
+    pedagog = 'Pedagog'
+    pedagog_stazher = 'Pedagog  Stazher'
+    pedagog_zhogary = 'Pedagog  Zhogary'
+    pedagog1sanat = 'Pedagog  1 sanat'
+    pedagog2sanat = 'Pedagog  2 sanat'
+    pedagog_sanat_zhok = 'Pedagog sanat zhok'
+    pedagog_choices = [
+        (pedagog_sheber, 'Pedagog Sheber'),
+        (pedagog_zertteushy, 'Pedagog  Zertteushy'),
+        (pedagog_sarapshy, 'Pedagog Sarapshy'),
+        (pedagog_moderator, 'Pedagog Moderator'),
+        (pedagog, 'Pedagog'),
+        (pedagog_stazher, 'Pedagog  Stazher'),
+        (pedagog_zhogary, 'Pedagog  Zhogary'),
+        (pedagog1sanat, 'Pedagog  1 sanat'),
+        (pedagog2sanat, 'Pedagog  2 sanat'),
+        (pedagog_sanat_zhok, 'Pedagog sanat zhok'),
+    ]
+    pedagog = models.CharField(
+        max_length=20,
+        choices=pedagog_choices,
+        default=pedagog_sheber,
+    )
 
     class Meta:
         verbose_name_plural = 'Teachers'
@@ -61,6 +97,17 @@ class Class(models.Model):
     school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
     classroom = models.ForeignKey('Classrooms', on_delete=models.CASCADE, null=True)
     class_teacher = models.OneToOneField(Teacher, on_delete=models.SET_NULL, null=True, blank=True, related_name='class_teacher')
+    KZ = 'KZ'
+    RU = 'RU'
+    lang_choices = [
+        (KZ, 'KZ'),
+        (RU, 'RU'),
+    ]
+    language = models.CharField(
+        max_length=20,
+        choices=lang_choices,
+        default=KZ,
+    )
 
     class Meta:
         verbose_name_plural = 'Classes'
@@ -80,21 +127,43 @@ class TeacherWorkload(models.Model):
         return f"{self.teacher} Workload"
     
 
+
+class Ring(models.Model):
+    school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
+    plan = models.PositiveIntegerField(choices=[(i, i) for i in range(1, 10)])
+    smena = models.IntegerField(choices=[(1, '1 смена'), (2, '2 смена'),(3, '3 смена'),(4, '4 смена')], default=1)
+    number = models.PositiveIntegerField(choices=[(i, i) for i in range(1, 20)])
+    start_time = models.TimeField(default=datetime.time(0, 0))
+    end_time = models.TimeField(default=datetime.time(0, 0))
+    def __str__(self):
+        return f'{self.start_time}-{self.end_time}'
+    
+class DopUrokRing(models.Model):
+    school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
+    plan = models.PositiveIntegerField(choices=[(i, i) for i in range(1, 10)])
+    smena = models.IntegerField(choices=[(1, '1 смена'), (2, '2 смена'),(3, '3 смена'),(4, '4 смена')], default=1)
+    number = models.PositiveIntegerField(choices=[(i, i) for i in range(1, 20)])
+    start_time = models.TimeField(default=datetime.time(0, 0))
+    end_time = models.TimeField(default=datetime.time(0, 0))
+    def __str__(self):
+        return f'{self.start_time}-{self.end_time}'
+
+
 class Schedule(models.Model):
     school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
-    Monday = "Пн"
-    Tuesday = "Вт"
-    Wednesday = "Ср"
-    Thursday = "Чт"
-    Friday = "Пт"
-    Saturday = "Сб"
+    Monday = "1"
+    Tuesday = "2"
+    Wednesday = "3"
+    Thursday = "4"
+    Friday = "5"
+    Saturday = "6"
     WEEK_DAY_CHOICES = [
-        (Monday, "Пн"),
-        (Tuesday, "Вт"),
-        (Wednesday, "Ср"),
-        (Thursday, "Чт"),
-        (Friday, "Пт"),
-        (Saturday, "Сб")
+        (Monday, "1"),
+        (Tuesday, "2"),
+        (Wednesday, "3"),
+        (Thursday, "4"),
+        (Friday, "5"),
+        (Saturday, "6")
     ]
     week_day = models.CharField(
         max_length=20,
@@ -104,33 +173,31 @@ class Schedule(models.Model):
     subject = models.ForeignKey('Subject', on_delete=models.CASCADE, null=True)
     classl = models.ForeignKey('Class', on_delete=models.CASCADE, null=True)
     teacher = models.ForeignKey('Teacher', on_delete=models.CASCADE, null=True)
+    ring = models.ForeignKey('Ring', on_delete=models.CASCADE,null=True)
     classroom = models.ForeignKey('Classrooms', on_delete=models.CASCADE, null=True)
-    start_time = models.TimeField(default=datetime.time(0, 0))
-    end_time = models.TimeField(default=datetime.time(0, 0))
     teacher2 = models.ForeignKey('Teacher', on_delete=models.CASCADE, null=True,blank=True, related_name='teacher_g2')
     classroom2 = models.ForeignKey('Classrooms', on_delete=models.CASCADE, null=True,blank=True, related_name='classroom_g2')
     subject2 = models.ForeignKey('Subject', on_delete=models.CASCADE, null=True, blank=True, related_name='subject_g2')
-    plan = models.PositiveIntegerField(choices=[(i, i) for i in range(1, 10)])
-    smena = models.IntegerField(choices=[(1, '1 смена'), (2, '2 смена'),(3, '3 смена'),(4, '4 смена')], default=1)
-
+    typez = models.ForeignKey('Extra_Lessons', on_delete=models.CASCADE, null=True,blank=True)
+  
     def __str__(self):
-        return f'{self.school} {self.classl} - {self.week_day} - {self.start_time.strftime("%H:%M")} - {self.end_time.strftime("%H:%M")}'
+        return f'{self.school} {self.classl} - {self.week_day}'
 
-class Facultative(models.Model):
+class DopUrok(models.Model):
     school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
-    Monday = "Пн"
-    Tuesday = "Вт"
-    Wednesday = "Ср"
-    Thursday = "Чт"
-    Friday = "Пт"
-    Saturday = "Сб"
+    Monday = "1"
+    Tuesday = "2"
+    Wednesday = "3"
+    Thursday = "4"
+    Friday = "5"
+    Saturday = "6"
     WEEK_DAY_CHOICES = [
-        (Monday, "Пн"),
-        (Tuesday, "Вт"),
-        (Wednesday, "Ср"),
-        (Thursday, "Чт"),
-        (Friday, "Пт"),
-        (Saturday, "Сб")
+        (Monday, "1"),
+        (Tuesday, "2"),
+        (Wednesday, "3"),
+        (Thursday, "4"),
+        (Friday, "5"),
+        (Saturday, "6")
     ]
     week_day = models.CharField(
         max_length=20,
@@ -138,11 +205,12 @@ class Facultative(models.Model):
         default=Monday,
     )
     faculative_name = models.CharField(max_length=200)
+    ring = models.ForeignKey('Ring', on_delete=models.CASCADE,null=True)
     classl = models.ForeignKey('Class', on_delete=models.CASCADE, null=True)
     teacher = models.ForeignKey('Teacher', on_delete=models.CASCADE, null=True)
     classroom = models.ForeignKey('Classrooms', on_delete=models.CASCADE, null=True)
-    start_time = models.TimeField(default=datetime.time(0, 0))
-    end_time = models.TimeField(default=datetime.time(0, 0))
+    typez = models.ForeignKey('Extra_Lessons', on_delete=models.CASCADE, null=True,blank=True)
+
 
     def __str__(self):
         return f'{self.school} - {self.classl} - {self.week_day} - {self.faculative_name}'
@@ -156,19 +224,19 @@ class Menu(models.Model):
     vihod_1 = models.CharField(max_length=100, null=True)
     vihod_2 = models.CharField(max_length=100, null=True)
     vihod_3 = models.CharField(max_length=100, null=True)
-    Monday = "Пн"
-    Tuesday = "Вт"
-    Wednesday = "Ср"
-    Thursday = "Чт"
-    Friday = "Пт"
-    Saturday = "Сб"
+    Monday = "1"
+    Tuesday = "2"
+    Wednesday = "3"
+    Thursday = "4"
+    Friday = "5"
+    Saturday = "6"
     WEEK_DAY_CHOICES = [
-        (Monday, "Пн"),
-        (Tuesday, "Вт"),
-        (Wednesday, "Ср"),
-        (Thursday, "Чт"),
-        (Friday, "Пт"),
-        (Saturday, "Сб")
+        (Monday, "1"),
+        (Tuesday, "2"),
+        (Wednesday, "3"),
+        (Thursday, "4"),
+        (Friday, "5"),
+        (Saturday, "6")
     ]
     week_day = models.CharField(
         max_length=20,
@@ -225,6 +293,19 @@ class PhotoforNews(models.Model):
     
 class Subject(models.Model):
     full_name = models.CharField(max_length=250)
+    EASY = 'EASY'
+    MEDIUM = 'MEDIUM'
+    HARD = 'HARD'
+    type_choices = [
+        (EASY, 'EASY'),
+        (MEDIUM, 'MEDIUM'),
+        (HARD, 'HARD'),
+    ]
+    type = models.CharField(
+        max_length=20,
+        choices=type_choices,
+        default=EASY,
+    )
     school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
 
     class Meta:
@@ -285,14 +366,14 @@ class School_SocialMedia(models.Model):
     SOCIAL_MEDIA_CHOICES = [
         (INSTAGRAM, 'Instagram'),
         (FACEBOOK, 'Facebook'),
-        (website, 'Manual'),
+        (website, 'website'),
     ]
     type = models.CharField(
         max_length=10,
         choices=SOCIAL_MEDIA_CHOICES,
         default=website, 
     )
-    instagram_account = models.CharField(max_length=250)
+    account_name = models.CharField(max_length=250)
     class Meta:
         verbose_name_plural = "School Social Media"
 
@@ -409,7 +490,6 @@ class School_Director(models.Model):
 
 class Extra_Lessons(models.Model):
     school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
-    type_short_name = models.CharField(max_length=100)
     type_full_name = models.CharField(max_length=200)
     type_color = ColorField(verbose_name='Выберите цвет')
 
@@ -447,6 +527,7 @@ class SpecialityHistory(models.Model):
         (srednee, "Среднее"),
         (Viswee, "Высшее"),
     ]
+    mamandygy = models.CharField(max_length=150, null=True)
     degree = models.CharField(
         max_length=20,
         choices=degree_choices,
@@ -469,19 +550,19 @@ class Kruzhok(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, null=True)
     photo = models.ImageField(upload_to='main/static/img',null=True)
     purpose = models.CharField(max_length=500)
-    Monday = "Пн"
-    Tuesday = "Вт"
-    Wednesday = "Ср"
-    Thursday = "Чт"
-    Friday = "Пт"
-    Saturday = "Сб"
+    Monday = "1"
+    Tuesday = "2"
+    Wednesday = "3"
+    Thursday = "4"
+    Friday = "5"
+    Saturday = "6"
     WEEK_DAY_CHOICES = [
-        (Monday, "Пн"),
-        (Tuesday, "Вт"),
-        (Wednesday, "Ср"),
-        (Thursday, "Чт"),
-        (Friday, "Пт"),
-        (Saturday, "Сб")
+        (Monday, "1"),
+        (Tuesday, "2"),
+        (Wednesday, "3"),
+        (Thursday, "4"),
+        (Friday, "5"),
+        (Saturday, "6")
     ]
 
     def __str__(self):

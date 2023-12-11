@@ -30,6 +30,11 @@ class ScheduleSerializer(serializers.ModelSerializer):
         model = Schedule
         fields = '__all__'
 
+class RingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ring
+        fields = '__all__'
+
 class MenuSerializer(serializers.ModelSerializer):
     class Meta:
         model = Menu
@@ -96,9 +101,14 @@ class Extra_LessonSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class FacultativeSerializer(serializers.ModelSerializer):
+class DopUrokSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Facultative
+        model = DopUrok
+        fields = '__all__'
+
+class DopUrokRingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DopUrok
         fields = '__all__'
 # ==================================================================================================
 

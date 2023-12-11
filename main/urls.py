@@ -25,6 +25,7 @@ router.register(r'api/PandikOlimpiadaApi', PandikOlimpiadaApi)
 router.register(r'api/School_RedCertificateApi', School_RedCertificateApi)
 router.register(r'api/School_AltynBelgiApi', School_AltynBelgiApi)
 router.register(r'api/School_SocialMediaApi', School_SocialMediaApi)
+router.register(r'api/ringApi', RingApi)
 
 urlpatterns = [
     path('', include(router.urls)),

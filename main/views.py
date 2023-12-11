@@ -105,6 +105,11 @@ class Extra_LessonsApi(viewsets.ModelViewSet):
     serializer_class = Extra_LessonSerializer
     permission_classes = [IsAuthenticated]
 
+class RingApi(viewsets.ModelViewSet):
+    queryset = Ring.objects.all()
+    serializer_class = RingSerializer
+    permission_classes = [IsAuthenticated]
+
 
 # ========================================================================================================
 class TeacherApi(viewsets.ModelViewSet):
@@ -156,5 +161,9 @@ class KruzhokListApi(viewsets.ModelViewSet):
     serializer_class = KruzhokSerializer
 
 class FacultativeListApi(viewsets.ModelViewSet):
-    queryset = Facultative.objects.all()
-    serializer_class = FacultativeSerializer
+    queryset = DopUrok.objects.all()
+    serializer_class = DopUrokSerializer
+
+class DopUrokRingApi(viewsets.ModelViewSet):
+    queryset = DopUrokRing.objects.all()
+    serializer_class = DopUrokRingSerializer
