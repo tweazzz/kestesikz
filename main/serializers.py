@@ -55,14 +55,34 @@ class School_AdministrationSerializer(serializers.ModelSerializer):
         model = School_Administration
         fields = '__all__'
 
-class Pride_of_the_SchoolSerializer(serializers.ModelSerializer):
+class Sport_SuccessSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Pride_of_the_School
+        model = Sport_Success
         fields = '__all__'
 
-class School_HistorySerializer(serializers.ModelSerializer):
+class Oner_SuccessSerializer(serializers.ModelSerializer):
     class Meta:
-        model = School_History
+        model = Oner_Success
+        fields = '__all__'
+
+class PandikOlimpiada_SuccessSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PandikOlimpiada_Success
+        fields = '__all__'
+
+class RedCertificateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RedCertificate
+        fields = '__all__'
+
+class AltynBelgiSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AltynBelgi
+        fields = '__all__'
+
+class School_SocialMediaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = School_SocialMedia
         fields = '__all__'
 
 class School_DirectorSerializer(serializers.ModelSerializer):
@@ -193,7 +213,7 @@ class TeacherWorkloadSerializer(serializers.ModelSerializer):
 class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
-        fields = ['week_day', 'start_time', 'end_time']
+        fields = ['week_day', 'start_time']
 
 class KruzhokSerializer(serializers.ModelSerializer):
     lessons = LessonSerializer(many=True)

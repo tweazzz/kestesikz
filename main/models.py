@@ -31,6 +31,7 @@ class School(models.Model):
 
 class Classrooms(models.Model):
     classroom_name = models.CharField(max_length=250)
+    classroom_number = models.IntegerField(default=1)
     flat = models.IntegerField()
     korpus = models.IntegerField()
     school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
@@ -152,7 +153,9 @@ class Menu(models.Model):
     food_name = models.CharField(max_length=250)
     food_reti = models.CharField(max_length=150)
     food_sostav = models.TextField()
-    vihod = models.CharField(max_length=250)
+    vihod_1 = models.CharField(max_length=100, null=True)
+    vihod_2 = models.CharField(max_length=100, null=True)
+    vihod_3 = models.CharField(max_length=100, null=True)
     Monday = "Пн"
     Tuesday = "Вт"
     Wednesday = "Ср"
@@ -182,7 +185,7 @@ class Menu(models.Model):
 
 class Slider(models.Model):
     slider_name = models.CharField(max_length=355)
-    slider_photo = models.CharField(max_length=350)
+    slider_photo = models.ImageField()
     school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
 
     class Meta:
@@ -230,17 +233,21 @@ class Subject(models.Model):
     def __str__(self):
         return f'{self.full_name}'
 
+
+
+# =============== School Pasport ============================================================
+
 class schoolPasport(models.Model):
     school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
     school_address = models.CharField(max_length=250)
-    tel_phone_school = models.CharField(max_length=255)
-    email = models.CharField(max_length=250)
     amount_of_children = models.IntegerField()
     ul_sany = models.IntegerField()
     kiz_sany = models.IntegerField()
     school_lang = models.CharField(max_length=255)
     status = models.CharField(max_length=250)
     vmestimost = models.IntegerField()
+    dayarlyk_class_number = models.IntegerField(null=True)
+    dayarlyk_student_number = models.IntegerField(null=True)
     number_of_students = models.IntegerField()
     number_of_classes = models.IntegerField()
     number_of_1_4_students = models.IntegerField()
@@ -251,20 +258,46 @@ class schoolPasport(models.Model):
     number_of_10_11_classes = models.CharField(max_length=20)
     amount_of_family = models.CharField(max_length=20)
     amount_of_parents = models.CharField(max_length=20)
-    pedagog_sheber = models.IntegerField()
-    pedagog_moderator = models.IntegerField()
-    pedagog_sarapshy = models.IntegerField()
-    pedagog_zertteushy = models.IntegerField()
-    pedagog = models.IntegerField()
-    instagram_account = models.CharField(max_length=250)
-    facebook_account = models.CharField(max_length=250)
-    youtube_account = models.CharField(max_length=250)
+    all_pedagog_number = models.IntegerField(null=True)
+    pedagog_sheber = models.IntegerField(null=True)
+    pedagog_zertteushy = models.IntegerField(null=True)
+    pedagog_sarapshy = models.IntegerField(null=True)
+    pedagog_moderator = models.IntegerField(null=True)
+    pedagog = models.IntegerField(null=True)
+    pedagog_stazher = models.IntegerField(null=True)
+    pedagog_zhogary = models.IntegerField(null=True)
+    pedagog_1sanat = models.IntegerField(null=True)
+    pedagog_2sanat = models.IntegerField(null=True)
+    pedagog_sanat_zhok = models.IntegerField(null=True)
+    school_history = models.TextField(null=True)
 
     class Meta:
         verbose_name_plural = 'School Pasport'
 
     def __str__(self):
         return f'{self.school} + School Passport'
+    
+class School_SocialMedia(models.Model):
+    school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
+    INSTAGRAM = 'instagram'
+    FACEBOOK = 'facebook'
+    website = 'website'
+    SOCIAL_MEDIA_CHOICES = [
+        (INSTAGRAM, 'Instagram'),
+        (FACEBOOK, 'Facebook'),
+        (website, 'Manual'),
+    ]
+    type = models.CharField(
+        max_length=10,
+        choices=SOCIAL_MEDIA_CHOICES,
+        default=website, 
+    )
+    instagram_account = models.CharField(max_length=250)
+    class Meta:
+        verbose_name_plural = "School Social Media"
+
+    def __str__(self):
+        return f'{self.school} Social Media {self.type}'
 
 
 class School_Administration(models.Model):
@@ -281,32 +314,85 @@ class School_Administration(models.Model):
         return f'{self.school} - {self.administrator_name}'
 
 
-class Pride_of_the_School(models.Model):
+# =================== Pride_of_the_School =====================================================
+
+class Sport_Success(models.Model):
     school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
     fullname = models.CharField(max_length=100)
-    photo = models.CharField(max_length=150)
-    student_success = models.CharField(max_length=150)
-    type_of_success = models.CharField(max_length=150)
+    photo = models.ImageField()
+    student_success = models.TextField()
     classl = models.ForeignKey('Class', on_delete=models.CASCADE, null=True)
 
     class Meta:
-        verbose_name_plural = "Pride of the School"
+        verbose_name_plural = f"Pride of the School Sport"
+    
+    def __str__(self):
+        return f'{self.fullname}'
+    
+class Oner_Success(models.Model):
+    school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
+    fullname = models.CharField(max_length=100)
+    photo = models.ImageField()
+    student_success = models.TextField()
+    classl = models.ForeignKey('Class', on_delete=models.CASCADE, null=True)
+
+    class Meta:
+        verbose_name_plural = f"Pride of the School Oner"
+    
+    def __str__(self):
+        return f'{self.fullname}'
+    
+class PandikOlimpiada_Success(models.Model):
+    school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
+    fullname = models.CharField(max_length=100)
+    photo = models.ImageField()
+    student_success = models.TextField()
+    classl = models.ForeignKey('Class', on_delete=models.CASCADE, null=True)
+
+    class Meta:
+        verbose_name_plural = f"Pride of the School Olimpiada"
     
     def __str__(self):
         return f'{self.fullname}'
 
-class School_History(models.Model):
-    school_photo = models.ImageField(upload_to='main/static/img')
-    school_full_name = models.CharField(max_length=100)
-    established =  models.DateField(verbose_name='Established')
-    school_directors = models.TextField()
-    school = models.ForeignKey('School', on_delete=models.CASCADE, null = True)
+class RedCertificate(models.Model):
+    school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
+    fullname = models.CharField(max_length=100)
+    photo = models.ImageField()
+    student_success = models.CharField(max_length=250)
+    endyear = models.CharField(max_length=10, default="2011-2022")
 
     class Meta:
-        verbose_name_plural = "School History"
-
+        verbose_name_plural = "Red Certificate"
+    
     def __str__(self):
-        return f'{self.school_full_name} + History'
+        return f'{self.fullname}, {self.school}, {self.endyear}'
+
+class AltynBelgi(models.Model):
+    school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
+    fullname = models.CharField(max_length=100)
+    photo = models.ImageField()
+    student_success = models.CharField(max_length=250)
+    endyear = models.CharField(max_length=10, default="2011-2022")
+
+    class Meta:
+        verbose_name_plural = "AltynBelgi"
+    
+    def __str__(self):
+        return f'{self.fullname}, {self.school}, {self.endyear}'
+
+# class School_History(models.Model):
+#     school_photo = models.ImageField(upload_to='main/static/img')
+#     school_full_name = models.CharField(max_length=100)
+#     established =  models.DateField(verbose_name='Established')
+#     school_directors = models.TextField()
+#     school = models.ForeignKey('School', on_delete=models.CASCADE, null = True)
+
+#     class Meta:
+#         verbose_name_plural = "School History"
+
+#     def __str__(self):
+#         return f'{self.school_full_name} + History'
     
 class School_Director(models.Model):
     director_name = models.CharField(max_length=100)
@@ -408,12 +494,11 @@ class Lesson(models.Model):
         choices=Kruzhok.WEEK_DAY_CHOICES,
         default=Kruzhok.Monday,
     )
-    start_time = models.TimeField()
-    end_time = models.TimeField()
+    start_end_time = models.CharField(max_length=150, default="8:00-8:45")
     lesson_order = models.PositiveIntegerField(default=1)
 
     class Meta:
-        unique_together = ['kruzhok', 'week_day', 'start_time', 'end_time', 'lesson_order']
+        unique_together = ['kruzhok', 'week_day', 'start_end_time', 'lesson_order']
 
     def __str__(self):
         return f'{self.kruzhok.kruzhok_name} - {self.get_week_day_display()} {self.start_time} - {self.end_time}'

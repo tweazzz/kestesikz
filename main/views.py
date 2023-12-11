@@ -65,14 +65,34 @@ class School_AdministrationApi(viewsets.ModelViewSet):
     serializer_class = School_AdministrationSerializer
     permission_classes = [IsAuthenticated]
 
-class Pride_of_the_SchoolApi(viewsets.ModelViewSet):
-    queryset = Pride_of_the_School.objects.all()
-    serializer_class = Pride_of_the_SchoolSerializer
+class Sport_SuccessApi(viewsets.ModelViewSet):
+    queryset = Sport_Success.objects.all()
+    serializer_class = Sport_SuccessSerializer
     permission_classes = [IsAuthenticated]
 
-class School_HistoryApi(viewsets.ModelViewSet):
-    queryset = School_History.objects.all()
-    serializer_class = School_HistorySerializer
+class Oner_SuccessApi(viewsets.ModelViewSet):
+    queryset = Sport_Success.objects.all()
+    serializer_class = Oner_SuccessSerializer
+    permission_classes = [IsAuthenticated]
+
+class PandikOlimpiadaApi(viewsets.ModelViewSet):
+    queryset = PandikOlimpiada_Success.objects.all()
+    serializer_class = PandikOlimpiada_SuccessSerializer
+    permission_classes = [IsAuthenticated]
+
+class School_RedCertificateApi(viewsets.ModelViewSet):
+    queryset = RedCertificate.objects.all()
+    serializer_class = RedCertificateSerializer
+    permission_classes = [IsAuthenticated]
+
+class School_AltynBelgiApi(viewsets.ModelViewSet):
+    queryset = AltynBelgi.objects.all()
+    serializer_class = AltynBelgiSerializer
+    permission_classes = [IsAuthenticated]
+
+class School_SocialMediaApi(viewsets.ModelViewSet):
+    queryset = School_SocialMedia.objects.all()
+    serializer_class = School_SocialMediaSerializer
     permission_classes = [IsAuthenticated]
 
 class School_DirectorApi(viewsets.ModelViewSet):
