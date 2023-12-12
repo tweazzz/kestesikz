@@ -2,15 +2,37 @@ from django.db import models
 from colorfield.fields import ColorField
 from django.contrib.auth.models import User
 import datetime
+from django.contrib.auth.models import AbstractUser
+from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 
-class Admin(models.Model):
-    email = models.CharField('email', max_length=100)
-    password = models.CharField('password', max_length=100)
-    school = models.OneToOneField('School', on_delete=models.CASCADE, blank=True, null=True)
+class Admin(AbstractUser):
+    email = models.EmailField(_('email address'), unique=True)
+    password = models.CharField(_('password'), max_length=128)
+
+    school = models.OneToOneField('School', on_delete=models.CASCADE, null=True, blank=True)
+    date_joined = models.DateTimeField(default=timezone.now, null=True)
+    USERNAME_FIELD = 'email'
+    username = None
+    groups = None
+    user_permissions = None
+    last_login = None
+    is_superuser = False
+    first_name = None
+    last_name = None
+    is_staff = True
+    is_active = True
+
 
     class Meta:
         verbose_name_plural = 'Admins'
         unique_together = ['school']
+    
+    def save(self, *args, **kwargs):
+        # self.password = make_password(self.password)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f'{self.email}'
@@ -32,13 +54,18 @@ class School(models.Model):
         choices=timezone_choices,
         default=GMT_5,
     )
-    user = models.ForeignKey('Admin', on_delete=models.CASCADE, null=True, related_name='Admins')
+    user = models.OneToOneField('Admin', on_delete=models.CASCADE, null=True, related_name='Admins')
 
     class Meta:
         verbose_name_plural = 'Schools'
 
     def __str__(self):
         return f'{self.school_full_name}'
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.user:
+            self.user.school = self
+            self.user.save()
 
 class Classrooms(models.Model):
     classroom_name = models.CharField(max_length=250)

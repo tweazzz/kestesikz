@@ -1,12 +1,15 @@
 from rest_framework import serializers
-
+from djoser.serializers import UserCreateSerializer, UserSerializer
+from .models import Admin 
 from .models import *
+from djoser.serializers import UserCreateSerializer, UserSerializer
+from django.contrib.auth import get_user_model
 
 
 class AdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = Admin
-        fields = '__all__'
+        fields = ['email','school']
 
 
 class SchoolSerializer(serializers.ModelSerializer):

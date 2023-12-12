@@ -2,6 +2,7 @@ from django.urls import path, include
 from . import views
 from main.views import *
 from rest_framework import routers
+from djoser.views import UserViewSet
 
 router = routers.DefaultRouter()
 router.register(r'api/admin', AdminsApi)
