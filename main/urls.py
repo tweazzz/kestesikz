@@ -1,8 +1,9 @@
-from django.urls import path, include
+from django.urls import path, include,re_path
 from . import views
 from main.views import *
 from rest_framework import routers
 from djoser.views import UserViewSet
+
 
 router = routers.DefaultRouter()
 router.register(r'api/admin', AdminsApi)
@@ -30,4 +31,6 @@ router.register(r'api/ringApi', RingApi)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('auth/', include('djoser.urls')),
+    re_path(r'^auth/', include('djoser.urls.authtoken')),
 ]

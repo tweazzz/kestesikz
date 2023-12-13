@@ -45,6 +45,11 @@ INSTALLED_APPS = [
     'djoser',
 ]
 
+# AUTH
+AUTH_USER_MODEL = 'main.Admin'
+AUTHENTICATION_BACKENDS = ['main.backends.EmailOrUsernameModelBackend', 'django.contrib.auth.backends.ModelBackend']
+
+
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
