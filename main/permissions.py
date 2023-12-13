@@ -1,5 +1,11 @@
 from rest_framework import permissions
 
-class IsAdminOfSchool(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        return request.user.admin.school == obj.school
+class IsTeacherOfAdminSchool(permissions.BasePermission):
+    message = "You do not have permission to access this resource."
+
+    def has_permission(self, request, view):
+        if request.user.is_superuser:
+            return True
+        elif request.user.is_staff:
+            return request.user.school_id == request.user.school_id
+        return False

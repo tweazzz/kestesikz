@@ -17,102 +17,121 @@ class SchoolSerializer(serializers.ModelSerializer):
         model = School
         fields = '__all__'
 
-class ClassroomApiSerializer(serializers.ModelSerializer):
+class ClassroomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Classrooms
-        fields = '__all__'
+        fields = ['id','classroom_name', 'classroom_number', 'flat', 'korpus','school']
+        read_only_fields = ['school']
 
 class ClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = Class
-        fields = '__all__'
+        fields = ['id','class_name','language','classroom','class_teacher','school']
+        read_only_fields = ['school']
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
-        fields = '__all__'
+        fields = ['id','weekday','ring','classl','teacher','subject','classroom','teacher2','classroom2','typez','school']
+        read_only_fields = ['school']
 
 class RingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ring
-        fields = '__all__'
+        fields = ['id','plan','smena','number','start_time','end_time','school']
+        read_only_fields = ['school']
 
 class MenuSerializer(serializers.ModelSerializer):
     class Meta:
         model = Menu
-        fields = '__all__'
+        fields = ['id','food_name','food_reti','food_sostav','vihod_1','vihod_2','vihod_3','week_day','school']
+        read_only_fields = ['school']
 
 class SliderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Slider
-        fields = '__all__'
+        fields = ['id','slider_name','slider_photo','school']
+        read_only_fields = ['school']
 
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject
-        fields = '__all__'
+        fields = ['id','full_name','type','school']
+        read_only_fields = ['school']
 
 class schoolPasportApiSerializer(serializers.ModelSerializer):
     class Meta:
         model = schoolPasport
-        fields = '__all__'
+        fields = ['id','school_address','amount_of_children','ul_sany','kiz_sany','school_lang','status','vmestimost','dayarlyk_class_number','dayarlyk_student_number','number_of_students','number_of_classes','number_of_1_4_students','number_of_1_4_classes','number_of_5_9_students','number_of_5_9_classes','number_of_10_11_students','number_of_10_11_classes','amount_of_family','amount_of_parents','all_pedagog_number','pedagog_sheber','pedagog_zertteushy','pedagog_sarapshy','pedagog_moderator','pedagog','pedagog_stazher','pedagog_zhogary','pedagog_1sanat','pedagog_2sanat','pedagog_sanat_zhok','school_history','school']
+        read_only_fields = ['school']
 
 class School_AdministrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = School_Administration
-        fields = '__all__'
+        fields = ['id','administrator_name','phone_number','administator_photo','position','school']
+        read_only_fields = ['school']
 
 class Sport_SuccessSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sport_Success
-        fields = '__all__'
+        fields = ['id','fullname','photo','student_success','classl','school']
+        read_only_fields = ['school']
 
 class Oner_SuccessSerializer(serializers.ModelSerializer):
     class Meta:
         model = Oner_Success
-        fields = '__all__'
+        fields = ['id','fullname','photo','student_success','classl','school']
+        read_only_fields = ['school']
 
 class PandikOlimpiada_SuccessSerializer(serializers.ModelSerializer):
     class Meta:
         model = PandikOlimpiada_Success
-        fields = '__all__'
+        fields = ['id','fullname','photo','student_success','classl','school']
+        read_only_fields = ['school']
 
 class RedCertificateSerializer(serializers.ModelSerializer):
     class Meta:
         model = RedCertificate
-        fields = '__all__'
+        fields = ['id','fullname','photo','student_success','endyear','school']
+        read_only_fields = ['school']
 
 class AltynBelgiSerializer(serializers.ModelSerializer):
     class Meta:
         model = AltynBelgi
-        fields = '__all__'
+        fields = ['id','fullname','photo','student_success','endyear','school']
+        read_only_fields = ['school']
 
 class School_SocialMediaSerializer(serializers.ModelSerializer):
     class Meta:
         model = School_SocialMedia
-        fields = '__all__'
+        fields = ['id','type','account_name','school']
+        read_only_fields = ['school']
 
 class School_DirectorSerializer(serializers.ModelSerializer):
     class Meta:
         model = School_Director
-        fields = '__all__'
+        fields = ['id','director_name','director_photo','phone_number','email','school']
+        read_only_fields = ['school']
 
 class Extra_LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Extra_Lessons
-        fields = '__all__'
+        fields = ['id','type_full_name','type_color','school']
+        read_only_fields = ['school']
 
 
 class DopUrokSerializer(serializers.ModelSerializer):
     class Meta:
         model = DopUrok
-        fields = '__all__'
+        fields = ['id','week_day','ring','classl','teacher','classroom','typez','school']
+        read_only_fields = ['school']
 
 class DopUrokRingSerializer(serializers.ModelSerializer):
     class Meta:
-        model = DopUrok
-        fields = '__all__'
+        model = DopUrokRing
+        fields = ['id','plan','smena','number','start_time','end_time','school']
+        read_only_fields = ['school']
 # ==================================================================================================
 
 
@@ -147,10 +166,9 @@ class TeacherSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Teacher
-        fields = [
-            'id', 'full_name', 'photo3x4', 'school', 'classl', 'subject', 'short_info',
-            'job_history', 'speciality_history'
-        ]
+        fields = ['id','full_name','photo3x4','subject','pedagog','job_history','speciality_history','school']
+        read_only_fields = ['school']
+        
 
     def to_representation(self, instance):
         representation = super(TeacherSerializer, self).to_representation(instance)
@@ -181,7 +199,7 @@ class TeacherCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Teacher
-        fields = ['full_name', 'photo3x4', 'short_info', 'job_history', 'speciality_history', 'school', 'classl', 'subject']
+        fields = '__all__'
 
     def create(self, validated_data):
         job_history_data = validated_data.pop('job_history', [])
@@ -234,6 +252,7 @@ class KruzhokSerializer(serializers.ModelSerializer):
     class Meta:
         model = Kruzhok
         fields = ['id', 'kruzhok_name', 'school', 'teacher', 'photo', 'purpose', 'lessons']
+        read_only_fields = ['school']
 
     def create(self, validated_data):
         lessons_data = validated_data.pop('lessons')

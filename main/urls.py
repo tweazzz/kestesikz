@@ -28,6 +28,8 @@ router.register(r'api/School_RedCertificateApi', School_RedCertificateApi)
 router.register(r'api/School_AltynBelgiApi', School_AltynBelgiApi)
 router.register(r'api/School_SocialMediaApi', School_SocialMediaApi)
 router.register(r'api/ringApi', RingApi)
+router.register(r'api/DopUrokApi', DopUrokApi)
+router.register(r'api/DopUrokRingApi', DopUrokRingApi)
 
 urlpatterns = [
     path('', include(router.urls)),

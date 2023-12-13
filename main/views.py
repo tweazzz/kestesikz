@@ -7,7 +7,7 @@ from django.views.generic import ListView, DetailView
 from main.models import *
 from main.serializers import *
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-# Create your views here.
+from .permissions import IsTeacherOfAdminSchool
 
 
 class AdminsApi(viewsets.ModelViewSet):
@@ -22,99 +22,185 @@ class SchoolsApi(viewsets.ModelViewSet):
 
 class ClassroomApi(viewsets.ModelViewSet):
     queryset = Classrooms.objects.all()
-    serializer_class = ClassroomApiSerializer
-    permission_classes = [IsAuthenticated]
+    serializer_class = ClassroomSerializer
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
 
-class TeacherApi(viewsets.ModelViewSet):
-    queryset = Teacher.objects.all()
-    serializer_class = TeacherSerializer
-    permission_classes = [IsAuthenticated]
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return Classrooms.objects.filter(school=self.request.user.school)
 
 class ClassApi(viewsets.ModelViewSet):
     queryset = Class.objects.all()
     serializer_class = ClassSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return Class.objects.filter(school=self.request.user.school)
 
 class ScheduleApi(viewsets.ModelViewSet):
     queryset = Schedule.objects.all()
     serializer_class = ScheduleSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return Schedule.objects.filter(school=self.request.user.school)
 
 class MenuApi(viewsets.ModelViewSet):
     queryset = Menu.objects.all()
     serializer_class = MenuSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return Menu.objects.filter(school=self.request.user.school)
 
 class SliderApi(viewsets.ModelViewSet):
     queryset = Slider.objects.all()
     serializer_class = SliderSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return Slider.objects.filter(school=self.request.user.school)
 
 class SubjectApi(viewsets.ModelViewSet):
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return Subject.objects.filter(school=self.request.user.school)
 
 class schoolPasportApi(viewsets.ModelViewSet):
     queryset = schoolPasport.objects.all()
     serializer_class = schoolPasportApiSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return schoolPasport.objects.filter(school=self.request.user.school)
 
 class School_AdministrationApi(viewsets.ModelViewSet):
     queryset = School_Administration.objects.all()
     serializer_class = School_AdministrationSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return School_Administration.objects.filter(school=self.request.user.school)
 
 class Sport_SuccessApi(viewsets.ModelViewSet):
     queryset = Sport_Success.objects.all()
     serializer_class = Sport_SuccessSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return Sport_Success.objects.filter(school=self.request.user.school)
 
 class Oner_SuccessApi(viewsets.ModelViewSet):
     queryset = Sport_Success.objects.all()
     serializer_class = Oner_SuccessSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return Oner_Success.objects.filter(school=self.request.user.school)
 
 class PandikOlimpiadaApi(viewsets.ModelViewSet):
     queryset = PandikOlimpiada_Success.objects.all()
     serializer_class = PandikOlimpiada_SuccessSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return PandikOlimpiada_Success.objects.filter(school=self.request.user.school)
 
 class School_RedCertificateApi(viewsets.ModelViewSet):
     queryset = RedCertificate.objects.all()
     serializer_class = RedCertificateSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return RedCertificate.objects.filter(school=self.request.user.school)
 
 class School_AltynBelgiApi(viewsets.ModelViewSet):
     queryset = AltynBelgi.objects.all()
     serializer_class = AltynBelgiSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return AltynBelgi.objects.filter(school=self.request.user.school)
 
 class School_SocialMediaApi(viewsets.ModelViewSet):
     queryset = School_SocialMedia.objects.all()
     serializer_class = School_SocialMediaSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return School_SocialMedia.objects.filter(school=self.request.user.school)
 
 class School_DirectorApi(viewsets.ModelViewSet):
     queryset = School_Director.objects.all()
     serializer_class = School_DirectorSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return School_Director.objects.filter(school=self.request.user.school)
 
 class Extra_LessonsApi(viewsets.ModelViewSet):
     queryset = Extra_Lessons.objects.all()
     serializer_class = Extra_LessonSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return Extra_Lessons.objects.filter(school=self.request.user.school)
 
 class RingApi(viewsets.ModelViewSet):
     queryset = Ring.objects.all()
     serializer_class = RingSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return Ring.objects.filter(school=self.request.user.school)
 
 
 # ========================================================================================================
 class TeacherApi(viewsets.ModelViewSet):
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return Teacher.objects.filter(school=self.request.user.school)
 
     def get_serializer_class(self):
         if self.action == 'create' or self.action == 'update':
@@ -144,7 +230,12 @@ class TeacherApi(viewsets.ModelViewSet):
 class TeacherWorkloadApi(viewsets.ModelViewSet):
     queryset = TeacherWorkload.objects.all()
     serializer_class = TeacherWorkloadSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return TeacherWorkload.objects.filter(school=self.request.user.school)
 
 class JobHistoryViewSet(viewsets.ModelViewSet):
     queryset = JobHistory.objects.all()
@@ -159,11 +250,39 @@ class SpecialityHistoryViewSet(viewsets.ModelViewSet):
 class KruzhokListApi(viewsets.ModelViewSet):
     queryset = Kruzhok.objects.all()
     serializer_class = KruzhokSerializer
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return Kruzhok.objects.filter(school=self.request.user.school)
 
 class FacultativeListApi(viewsets.ModelViewSet):
     queryset = DopUrok.objects.all()
     serializer_class = DopUrokSerializer
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return DopUrok.objects.filter(school=self.request.user.school)
+
+class DopUrokApi(viewsets.ModelViewSet):
+    queryset = DopUrok.objects.all()
+    serializer_class = DopUrokSerializer
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return DopUrok.objects.filter(school=self.request.user.school)
 
 class DopUrokRingApi(viewsets.ModelViewSet):
     queryset = DopUrokRing.objects.all()
     serializer_class = DopUrokRingSerializer
+    permission_classes = [IsAuthenticated, IsTeacherOfAdminSchool]
+
+    def perform_create(self, serializer):
+        serializer.save(school=self.request.user.school)
+    def get_queryset(self):
+        return DopUrokRing.objects.filter(school=self.request.user.school)
