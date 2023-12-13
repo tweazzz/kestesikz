@@ -20,10 +20,26 @@ class TeacherAdmin(admin.ModelAdmin):
 admin.site.register(Teacher, TeacherAdmin)
 
 
-class ClassAdmin(admin.ModelAdmin):
-    list_display = ('class_name', 'school', 'classroom', 'class_teacher')
-    list_editable = ('class_teacher',)
-    search_fields = ('class_name', 'school__name', 'classroom__name', 'class_teacher__full_name')
+from django.contrib.auth.admin import UserAdmin
+
+class UsersAdmin(UserAdmin):
+    list_display = ('email', 'is_active')
+    list_display_links = ('email',)
+    search_fields = ('email', 'name', )
+    readonly_fields = ('id', )
+    ordering = ('id',)
+    filter_horizontal = ()
+    list_filter = ('is_active', 'is_superuser')
+    fieldsets = ()
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'password1', 'password2'),
+        }),
+    )
+
+
+admin.site.register(Admin, UsersAdmin)
 
 class PhotoforNewsInline(admin.TabularInline):
     model = PhotoforNews
@@ -35,8 +51,7 @@ class NewsAdmin(admin.ModelAdmin):
 
 admin.site.register(News, NewsAdmin)
 
-admin.site.register(Class, ClassAdmin)
-admin.site.register(Admin)
+
 admin.site.register(School)
 admin.site.register(Classrooms)
 admin.site.register(Schedule)
