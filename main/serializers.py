@@ -29,11 +29,17 @@ class ClassSerializer(serializers.ModelSerializer):
         fields = ['id','class_name','language','classroom','class_teacher','school']
         read_only_fields = ['school']
 
+class NewsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = News
+        fields = ['id','date','text','type','photos','school']
+        read_only_fields = ['school']
+
 
 class ScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
-        fields = ['id','weekday','ring','classl','teacher','subject','classroom','teacher2','classroom2','typez','school']
+        fields = ['id','week_day','ring','classl','teacher','subject','classroom','teacher2','classroom2','typez','school']
         read_only_fields = ['school']
 
 class RingSerializer(serializers.ModelSerializer):
@@ -189,11 +195,6 @@ class TeacherCreateSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False
     )
-    subject = serializers.PrimaryKeyRelatedField(
-        queryset=Subject.objects.all(),
-        write_only=True,
-        required=False
-    )
     job_history = JobHistorySerializer(many=True, required=False)
     speciality_history = SpecialityHistorySerializer(many=True, required=False)
 
@@ -244,7 +245,7 @@ class TeacherWorkloadSerializer(serializers.ModelSerializer):
 class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
-        fields = ['week_day', 'start_time']
+        fields = ['week_day', 'start_end_time']
 
 class KruzhokSerializer(serializers.ModelSerializer):
     lessons = LessonSerializer(many=True)
@@ -262,5 +263,9 @@ class KruzhokSerializer(serializers.ModelSerializer):
         for lesson_data in lessons_data:
             Lesson.objects.create(kruzhok=kruzhok, lesson_order=lesson_order_counter, **lesson_data)
             lesson_order_counter += 1
-
-        return kruzhok
+    
+    def to_representation(self, instance):
+        representation = super(KruzhokSerializer, self).to_representation(instance)
+        teacher_name = instance.teacher.full_name
+        representation['teacher'] = {'full_name': teacher_name}
+        return representation

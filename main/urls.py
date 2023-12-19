@@ -20,7 +20,6 @@ router.register(r'api/school_administration', School_AdministrationApi)
 router.register(r'api/school_director', School_DirectorApi)
 router.register(r'api/extra_lesson', Extra_LessonsApi)
 router.register(r'api/kruzhok', KruzhokListApi)
-router.register(r'api/facultative', FacultativeListApi)
 router.register(r'api/Sport_SuccessApi', Sport_SuccessApi)
 router.register(r'api/Oner_SuccessApi', Oner_SuccessApi)
 router.register(r'api/PandikOlimpiadaApi', PandikOlimpiadaApi)
@@ -30,6 +29,7 @@ router.register(r'api/School_SocialMediaApi', School_SocialMediaApi)
 router.register(r'api/ringApi', RingApi)
 router.register(r'api/DopUrokApi', DopUrokApi)
 router.register(r'api/DopUrokRingApi', DopUrokRingApi)
+router.register(r'api/newsApi', NewsApi)
 
 urlpatterns = [
     path('', include(router.urls)),

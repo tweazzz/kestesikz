@@ -35,7 +35,9 @@ class Admin(AbstractBaseUser, PermissionsMixin):
 
 
 class School(models.Model):
-    school_full_name = models.CharField('school_full_name', max_length=255)
+    school_kz_name = models.CharField('school_full_name', max_length=255)
+    school_ru_name = models.CharField('school_full_name', max_length=255, null=True)
+    school_eng_name = models.CharField('school_full_name', max_length=255, null=True)
     url = models.CharField('url', max_length=255)
     city = models.CharField('city', max_length=255)
     logo = models.ImageField(blank=True, null=True)
@@ -62,7 +64,7 @@ class School(models.Model):
             self.user.save()
 
     def __str__(self):
-        return f'{self.school_full_name}'
+        return f'{self.school_kz_name}'
 
 class Classrooms(models.Model):
     classroom_name = models.CharField(max_length=250)
@@ -345,7 +347,8 @@ class Subject(models.Model):
 class schoolPasport(models.Model):
     school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
     school_address = models.CharField(max_length=250)
-    amount_of_children = models.IntegerField()
+    established = models.IntegerField(default=2008)
+    amount_of_children = models.IntegerField(null=True)
     ul_sany = models.IntegerField()
     kiz_sany = models.IntegerField()
     school_lang = models.CharField(max_length=255)
@@ -606,4 +609,4 @@ class Lesson(models.Model):
         unique_together = ['kruzhok', 'week_day', 'start_end_time', 'lesson_order']
 
     def __str__(self):
-        return f'{self.kruzhok.kruzhok_name} - {self.get_week_day_display()} {self.start_time} - {self.end_time}'
+        return f'{self.kruzhok.kruzhok_name} - {self.week_day} {self.start_end_time}'
