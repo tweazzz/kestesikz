@@ -1,0 +1,83 @@
+<!-- templates/kruzhok_form.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kruzhok Form</title>
+</head>
+<body>
+    <h1>Create/Update Kruzhok</h1>
+    <form id="kruzhokForm">
+        <label for="kruzhokName">Kruzhok Name:</label>
+        <input type="text" id="kruzhokName" name="kruzhok_name" required><br>
+
+        <label for="teacher">Teacher:</label>
+        <select id="teacher" name="teacher" required>
+            <!-- Options will be populated using JavaScript or retrieved from your API endpoint -->
+        </select><br>
+
+        <label for="purpose">Purpose:</label>
+        <input type="text" id="purpose" name="purpose" required><br>
+
+        <!-- Add other fields as needed -->
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        // Fetch available teachers and populate the dropdown
+        fetch('/api/kruzhok/available_teachers/')
+            .then(response => response.json())
+            .then(data => {
+                const teacherDropdown = document.getElementById('teacher');
+                data.forEach(teacher => {
+                    const option = document.createElement('option');
+                    option.value = teacher.id;
+                    option.text = teacher.full_name;
+                    teacherDropdown.add(option);
+                });
+            });
+
+        // Handle form submission
+        const form = document.getElementById('kruzhokForm');
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            // Collect form data
+            const formData = new FormData(form);
+            const requestBody = {};
+            formData.forEach((value, key) => {
+                requestBody[key] = value;
+            });
+
+            // Submit the data to your API endpoint using fetch or another AJAX method
+            fetch('/api/kruzhok/', {
+                method: 'POST',  // Change to 'PUT' for updates
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')  // Ensure you have the CSRF token
+                },
+                body: JSON.stringify(requestBody)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                // Add any additional logic or redirect after successful submission
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Handle errors as needed
+            });
+        });
+
+        // Function to get CSRF token from cookies
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+    </script>
+</body>
+</html>
