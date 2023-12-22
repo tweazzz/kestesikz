@@ -30,12 +30,6 @@ class ClassSerializer(serializers.ModelSerializer):
         read_only_fields = ['school']
 
 
-class ScheduleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Schedule
-        fields = ['id','week_day','ring','classl','teacher','subject','classroom','teacher2','classroom2','typez','school']
-        read_only_fields = ['school']
-
 class RingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ring
@@ -79,22 +73,105 @@ class ClassForProudSSerializer(serializers.ModelSerializer):
         fields = ['id', 'class_name']
 
 class Sport_SuccessSerializer(serializers.ModelSerializer):
+    class_id = serializers.PrimaryKeyRelatedField(
+        source='classl',
+        queryset=Class.objects.all(),
+        write_only=True,
+        required=False
+    )
+
     class Meta:
         model = Sport_Success
-        fields = ['id','fullname','photo','student_success','classl','school']
+        fields = ['id', 'fullname', 'photo', 'student_success', 'classl', 'school', 'class_id']
         read_only_fields = ['school']
+
+    classl = serializers.SerializerMethodField()
+
+    def get_classl(self, obj):
+        return str(obj.classl) if obj.classl else None
+    
+    def create(self, validated_data):
+        class_id = validated_data.pop('class_id', None)
+
+        sport_succes = Sport_Success.objects.create(**validated_data)
+
+        if class_id:
+            try:
+                class_instance = Class.objects.get(id=class_id)
+                sport_succes.classl = class_instance
+                sport_succes.save()
+            except Class.DoesNotExist:
+                pass
+
+        return sport_succes
 
 class Oner_SuccessSerializer(serializers.ModelSerializer):
+    class_id = serializers.PrimaryKeyRelatedField(
+        source='classl',
+        queryset=Class.objects.all(),
+        write_only=True,
+        required=False
+    )
+
     class Meta:
         model = Oner_Success
-        fields = ['id','fullname','photo','student_success','classl','school']
+        fields = ['id', 'fullname', 'photo', 'student_success', 'classl', 'school', 'class_id']
         read_only_fields = ['school']
 
+    classl = serializers.SerializerMethodField()
+
+    def get_classl(self, obj):
+        return str(obj.classl) if obj.classl else None
+    
+    def create(self, validated_data):
+        class_id = validated_data.pop('class_id', None)
+
+        oner_success = Oner_Success.objects.create(**validated_data)
+
+        if class_id:
+            try:
+                class_instance = Class.objects.get(id=class_id)
+                oner_success.classl = class_instance
+                oner_success.save()
+            except Class.DoesNotExist:
+                pass
+
+        return oner_success
+
+
+
 class PandikOlimpiada_SuccessSerializer(serializers.ModelSerializer):
+    class_id = serializers.PrimaryKeyRelatedField(
+        source='classl',
+        queryset=Class.objects.all(),
+        write_only=True,
+        required=False
+    )
+
     class Meta:
         model = PandikOlimpiada_Success
-        fields = ['id','fullname','photo','student_success','classl','school']
+        fields = ['id', 'fullname', 'photo', 'student_success', 'classl', 'school', 'class_id']
         read_only_fields = ['school']
+
+    classl = serializers.SerializerMethodField()
+
+    def get_classl(self, obj):
+        return str(obj.classl) if obj.classl else None
+    
+    def create(self, validated_data):
+        class_id = validated_data.pop('class_id', None)
+
+        PandikOlimpiada = PandikOlimpiada_Success.objects.create(**validated_data)
+
+        if class_id:
+            try:
+                class_instance = Class.objects.get(id=class_id)
+                PandikOlimpiada.classl = class_instance
+                PandikOlimpiada.save()
+            except Class.DoesNotExist:
+                pass
+
+        return PandikOlimpiada
 
 class RedCertificateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -254,36 +331,52 @@ class LessonSerializer(serializers.ModelSerializer):
 
 class KruzhokSerializer(serializers.ModelSerializer):
     lessons = LessonSerializer(many=True)
-    teacher = SimpleTeacherSerializer()
+    teacher_id = serializers.PrimaryKeyRelatedField(
+        source='teacher',
+        queryset=Teacher.objects.all(),
+        write_only=True,
+        required=False
+    )
+
 
     class Meta:
         model = Kruzhok
-        fields = ['id', 'kruzhok_name', 'school', 'teacher', 'photo', 'purpose', 'lessons']
+        fields = ['id', 'kruzhok_name', 'school', 'teacher', 'photo', 'purpose', 'lessons', 'teacher_id']
         read_only_fields = ['school']
 
     def create(self, validated_data):
-        lessons_data = validated_data.pop('lessons')
+        lessons_data = validated_data.pop('lessons', [])
+        teacher_id = validated_data.pop('teacher_id', None)
+
         kruzhok = Kruzhok.objects.create(**validated_data)
-        
+
+        if teacher_id:
+            teacher = Teacher.objects.get(id=teacher_id)
+            kruzhok.teacher = teacher
+            kruzhok.save()
+
         lesson_order_counter = 1
         for lesson_data in lessons_data:
             Lesson.objects.create(kruzhok=kruzhok, lesson_order=lesson_order_counter, **lesson_data)
             lesson_order_counter += 1
 
         return kruzhok
-    
+
     def update(self, instance, validated_data):
-        lessons_data = validated_data.pop('lessons')
+        lessons_data = validated_data.pop('lessons', [])
+        teacher_id = validated_data.pop('teacher_id', None)
+
         instance.kruzhok_name = validated_data.get('kruzhok_name', instance.kruzhok_name)
         instance.purpose = validated_data.get('purpose', instance.purpose)
         instance.save()
 
-        teacher_data = validated_data.get('teacher', {})
-        teacher_id = teacher_data.get('id')
         if teacher_id:
-            teacher = Teacher.objects.get(id=teacher_id)
-            instance.teacher = teacher
-            instance.save()
+            try:
+                teacher = Teacher.objects.get(id=teacher_id)
+                instance.teacher = teacher
+                instance.save()
+            except Teacher.DoesNotExist:
+                pass
 
         instance.lessons.all().delete()
         lesson_order_counter = 1
@@ -327,3 +420,17 @@ class NewsSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['photos'] = [self.context['request'].build_absolute_uri(photo.image.url) if photo.image else None for photo in instance.photos.all()]
         return representation
+
+class ScheduleSerializer(serializers.ModelSerializer):
+    classl = ClassSerializer()
+    teacher = TeacherSerializer()
+    ring = RingSerializer()
+    subject = SubjectSerializer()
+    classroom = ClassroomSerializer()
+    teacher2 = TeacherSerializer()
+    classroom2 = ClassroomSerializer()
+    typez = Extra_Lessons()
+    class Meta:
+        model = Schedule
+        fields = ['id','week_day','ring','classl','teacher','subject','classroom','teacher2','classroom2','typez','school']
+        read_only_fields = ['school']

@@ -207,9 +207,16 @@ class Sport_SuccessApi(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def available_classes(self, request, *args, **kwargs):
-        classes = Class.objects.all()
-        serializer = ClassForProudSSerializer(classes, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if self.request.user.is_authenticated:
+            if self.request.user.is_superuser:
+                classes = Class.objects.all()
+            else:
+                classes = Class.objects.filter(school=self.request.user.school)
+
+            serializer = ClassForProudSSerializer(classes, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class Oner_SuccessApi(viewsets.ModelViewSet):
@@ -232,9 +239,16 @@ class Oner_SuccessApi(viewsets.ModelViewSet):
         return Oner_Success.objects.all()
     @action(detail=False, methods=['get'])
     def available_classes(self, request, *args, **kwargs):
-        classes = Class.objects.all()
-        serializer = ClassForProudSSerializer(classes, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if self.request.user.is_authenticated:
+            if self.request.user.is_superuser:
+                classes = Class.objects.all()
+            else:
+                classes = Class.objects.filter(school=self.request.user.school)
+
+            serializer = ClassForProudSSerializer(classes, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class PandikOlimpiadaApi(viewsets.ModelViewSet):
@@ -257,9 +271,16 @@ class PandikOlimpiadaApi(viewsets.ModelViewSet):
         return PandikOlimpiada_Success.objects.all()
     @action(detail=False, methods=['get'])
     def available_classes(self, request, *args, **kwargs):
-        classes = Class.objects.all()
-        serializer = ClassForProudSSerializer(classes, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if self.request.user.is_authenticated:
+            if self.request.user.is_superuser:
+                classes = Class.objects.all()
+            else:
+                classes = Class.objects.filter(school=self.request.user.school)
+
+            serializer = ClassForProudSSerializer(classes, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class School_RedCertificateApi(viewsets.ModelViewSet):

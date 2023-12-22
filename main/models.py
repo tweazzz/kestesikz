@@ -431,7 +431,7 @@ class School_Administration(models.Model):
 class Sport_Success(models.Model):
     school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
     fullname = models.CharField(max_length=100)
-    photo = models.ImageField()
+    photo = models.ImageField(null=True)
     student_success = models.TextField()
     classl = models.ForeignKey('Class', on_delete=models.CASCADE, null=True)
 
@@ -444,7 +444,7 @@ class Sport_Success(models.Model):
 class Oner_Success(models.Model):
     school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
     fullname = models.CharField(max_length=100)
-    photo = models.ImageField()
+    photo = models.ImageField(null=True)
     student_success = models.TextField()
     classl = models.ForeignKey('Class', on_delete=models.CASCADE, null=True)
 
@@ -457,7 +457,7 @@ class Oner_Success(models.Model):
 class PandikOlimpiada_Success(models.Model):
     school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
     fullname = models.CharField(max_length=100)
-    photo = models.ImageField()
+    photo = models.ImageField(null=True)
     student_success = models.TextField()
     classl = models.ForeignKey('Class', on_delete=models.CASCADE, null=True)
 
