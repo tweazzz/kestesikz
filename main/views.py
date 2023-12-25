@@ -11,11 +11,34 @@ from .permissions import IsAdminSchool,IsSuperAdminOrReadOnly
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import *
 from rest_framework.decorators import action
+from django.shortcuts import get_object_or_404
+from rest_framework.parsers import MultiPartParser, FormParser
 
 class AdminsApi(viewsets.ModelViewSet):
     queryset = Admin.objects.all()
     serializer_class = AdminSerializer
     permission_classes = [IsAdminSchool]
+
+
+class PhotoUploadMixin(viewsets.ModelViewSet):
+    parser_classes = (MultiPartParser, FormParser)
+    model = None
+    
+    @action(detail=False, methods=['post'])
+    def upload_photo(self, request, *args, **kwargs):
+        model_class = self.get_model_class()
+        obj_id = request.data.get('id')
+        print("Request data:", request.data)
+        obj = get_object_or_404(model_class, id=obj_id)
+        obj.photo = request.data.get('photo')
+        obj.save()
+        serializer = self.get_serializer(obj)
+        return Response(serializer.data)
+
+    def get_model_class(self):
+        if self.model:
+            return self.model
+        raise NotImplementedError("Subclasses must provide a model class.")
 
 class SchoolsApi(viewsets.ModelViewSet):
     queryset = School.objects.all()
@@ -23,6 +46,19 @@ class SchoolsApi(viewsets.ModelViewSet):
     permission_classes = [IsSuperAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filterset_class = SchoolFilter
+
+    @action(detail=False, methods=['get'])
+    def available_school(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            if self.request.user.is_superuser:
+                school = School.objects.all()
+            else:
+                school = School.objects.none()
+
+            serializer = AvailableSchoolSerializer(school, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class ClassroomApi(viewsets.ModelViewSet):
@@ -43,6 +79,19 @@ class ClassroomApi(viewsets.ModelViewSet):
             else:
                 return Classrooms.objects.filter(school=self.request.user.school)
         return Classrooms.objects.all()
+    
+    @action(detail=False, methods=['get'])
+    def available_classrooms(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            if self.request.user.is_superuser:
+                classroom = Classrooms.objects.all()
+            else:
+                classroom = Classrooms.objects.filter(school=self.request.user.school)
+
+            serializer = AvailableClassRoomSerializer(classroom, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
 
 class ClassApi(viewsets.ModelViewSet):
     queryset = Class.objects.all()
@@ -81,6 +130,32 @@ class ScheduleApi(viewsets.ModelViewSet):
             else:
                 return Schedule.objects.filter(school=self.request.user.school)
         return Schedule.objects.all()
+    
+    @action(detail=False, methods=['get'])
+    def available_ring(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            if self.request.user.is_superuser:
+                classroom = Ring.objects.all()
+            else:
+                classroom = Ring.objects.filter(school=self.request.user.school)
+
+            serializer = AvailableRingSerializer(classroom, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    @action(detail=False, methods=['get'])
+    def available_subject(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            if self.request.user.is_superuser:
+                classroom = Subject.objects.all()
+            else:
+                classroom = Subject.objects.filter(school=self.request.user.school)
+
+            serializer = AvailableSubjectSerializer(classroom, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class MenuApi(viewsets.ModelViewSet):
@@ -213,7 +288,7 @@ class Sport_SuccessApi(viewsets.ModelViewSet):
             else:
                 classes = Class.objects.filter(school=self.request.user.school)
 
-            serializer = ClassForProudSSerializer(classes, many=True)
+            serializer = AvailableClassesSerializer(classes, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
@@ -245,7 +320,7 @@ class Oner_SuccessApi(viewsets.ModelViewSet):
             else:
                 classes = Class.objects.filter(school=self.request.user.school)
 
-            serializer = ClassForProudSSerializer(classes, many=True)
+            serializer = AvailableClassesSerializer(classes, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
@@ -277,7 +352,7 @@ class PandikOlimpiadaApi(viewsets.ModelViewSet):
             else:
                 classes = Class.objects.filter(school=self.request.user.school)
 
-            serializer = ClassForProudSSerializer(classes, many=True)
+            serializer = AvailableClassesSerializer(classes, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
@@ -380,6 +455,19 @@ class Extra_LessonsApi(viewsets.ModelViewSet):
             else:
                 return Extra_Lessons.objects.filter(school=self.request.user.school)
         return Extra_Lessons.objects.all()
+    
+    @action(detail=False, methods=['get'])
+    def available_typez(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            if self.request.user.is_superuser:
+                typez = Extra_Lessons.objects.all()
+            else:
+                typez = Classrooms.objects.filter(school=self.request.user.school)
+
+            serializer = Extra_LessonSerializer(typez, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class RingApi(viewsets.ModelViewSet):
@@ -402,16 +490,39 @@ class RingApi(viewsets.ModelViewSet):
         return Ring.objects.all()
 
 
-class TeacherApi(viewsets.ModelViewSet):
+class TeacherApi(PhotoUploadMixin,viewsets.ModelViewSet):
+    model = Teacher
     queryset = Teacher.objects.all()
+    photo_field = 'photo3x4'
     serializer_class = TeacherSerializer
     permission_classes = [IsAdminSchool]
     filter_backends = [DjangoFilterBackend]
     filterset_class = TeacherFilter
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer, job_history_data, speciality_history_data):
+        print("Perform create method called.")
         if self.request.user.is_authenticated:
-            serializer.save(school=self.request.user.school)
+            print(f"Authenticated user: {self.request.user}")
+            if self.request.user.school:
+                serializer.validated_data['school'] = self.request.user.school
+                print(f"School set: {self.request.user.school}")
+            else:
+                print("User has no associated school.")
+        print(f"Serializer data before save: {serializer.validated_data}")
+        print(f"Job history data: {job_history_data}")
+        print(f"Speciality history data: {speciality_history_data}")
+
+        # Вместо serializer.save использовать следующую строку
+        teacher = serializer.save()
+
+        for job_data in job_history_data:
+            JobHistory.objects.create(teacher=teacher, **job_data)
+
+        for speciality_data in speciality_history_data:
+            SpecialityHistory.objects.create(teacher=teacher, **speciality_data)
+
+        print("Serializer saved successfully.")
+
 
     def get_queryset(self):
         if self.request.user.is_authenticated:
@@ -423,7 +534,7 @@ class TeacherApi(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == 'create' or self.action == 'update':
-            return TeacherCreateSerializer
+            return TeacherSerializer
         return TeacherSerializer
 
     def list(self, request, *args, **kwargs):
@@ -432,15 +543,19 @@ class TeacherApi(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        serializer = TeacherCreateSerializer(data=request.data)
+        job_history_data = request.data.get('job_history', [])
+        speciality_history_data = request.data.get('speciality_history', [])
+
+        serializer = TeacherSerializer(data=request.data)
+        print("Request data in create:", request.data)  # Добавьте эту строку
         if serializer.is_valid():
-            serializer.save()
+            self.perform_create(serializer, job_history_data, speciality_history_data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = TeacherCreateSerializer(instance, data=request.data)
+        serializer = TeacherSerializer(instance, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -460,13 +575,21 @@ class JobHistoryViewSet(viewsets.ModelViewSet):
     queryset = JobHistory.objects.all()
     serializer_class = JobHistorySerializer
     permission_classes = [IsAdminSchool]
+    def perform_create(self, serializer):
+        if self.request.user.is_authenticated:
+            serializer.save(school=self.request.user.school)
 
 class SpecialityHistoryViewSet(viewsets.ModelViewSet):
     queryset = JobHistory.objects.all()
     serializer_class = SpecialityHistorySerializer
     permission_classes = [IsAdminSchool]
+    def perform_create(self, serializer):
+        if self.request.user.is_authenticated:
+            serializer.save(school=self.request.user.school)
 
-class KruzhokListApi(viewsets.ModelViewSet):
+
+class KruzhokListApi(PhotoUploadMixin, viewsets.ModelViewSet):
+    model = Kruzhok
     queryset = Kruzhok.objects.all()
     serializer_class = KruzhokSerializer
     permission_classes = [IsAdminSchool]
@@ -488,9 +611,9 @@ class KruzhokListApi(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def available_teachers(self, request, *args, **kwargs):
         teachers = Teacher.objects.all()
-        serializer = SimpleTeacherSerializer(teachers, many=True)
+        serializer = AvailableTeacherSerializer(teachers, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         lessons = instance.lessons.all()

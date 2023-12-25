@@ -37,9 +37,16 @@ urlpatterns = [
     path('', include(router.urls)),
     path('auth/', include('djoser.urls')),
     re_path(r'^auth/', include('djoser.urls.authtoken')),
-    path('api/kruzhok/available_teachers/', KruzhokListApi.as_view({'get': 'available_teachers'}), name='available_teachers'),
-    path('api/prideofschool/available_classes/', Sport_SuccessApi.as_view({'get': 'available_classes'}), name='available_classes'),
-
+    path('api/available_school/', SchoolsApi.as_view({'get': 'available_school'}), name='available-school'),
+    path('api/available_teachers/', KruzhokListApi.as_view({'get': 'available_teachers'}), name='available_teachers'),
+    path('api/available_classes/', Sport_SuccessApi.as_view({'get': 'available_classes'}), name='available_classes'),
+    path('api/available_classrooms/', ClassroomApi.as_view({'get': 'available_classrooms'}), name='available_classrooms'),
+    path('api/available_ring/', ScheduleApi.as_view({'get': 'available_ring'}), name='available-ring'),
+    path('api/available_subject/', ScheduleApi.as_view({'get': 'available_subject'}), name='available-subject'),
+    path('api/available_typez/', Extra_LessonsApi.as_view({'get': 'available_typez'}), name='available-typez'),
+    path('api/kruzhok/upload_photo/', KruzhokListApi.as_view({'post': 'upload_photo'}), name='upload_photo'),
+    path('api/teacher/upload_photo/', TeacherApi.as_view({'post': 'upload_photo'}), name='upload_photo'),
+    path('api/schoolpasport/upload_photo/', schoolPasportApi.as_view({'post': 'upload_photo'}), name='upload_photo'),
 ]
 
 if settings.DEBUG:

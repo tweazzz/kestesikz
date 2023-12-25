@@ -129,6 +129,7 @@ class School_PasportFilter(filters.FilterSet):
     class Meta:
         model = schoolPasport
         fields = '__all__'
+        exclude = ['photo']
 
 class School_SocialMediaFilter(filters.FilterSet):
     class Meta:
