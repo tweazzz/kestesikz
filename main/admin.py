@@ -3,6 +3,8 @@ from django.contrib import admin
 # Register your models here.
 
 from main.models import *
+from django.forms import modelformset_factory, ClearableFileInput, HiddenInput
+from django import forms
 
 
 
@@ -41,8 +43,14 @@ class UsersAdmin(UserAdmin):
 
 admin.site.register(Admin, UsersAdmin)
 
+class PhotoforNewsInlineForm(forms.ModelForm):
+    class Meta:
+        model = PhotoforNews
+        fields = '__all__'
+
 class PhotoforNewsInline(admin.TabularInline):
     model = PhotoforNews
+    form = PhotoforNewsInlineForm
     extra = 1
 
 class NewsAdmin(admin.ModelAdmin):

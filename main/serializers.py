@@ -23,29 +23,20 @@ class ClassroomSerializer(serializers.ModelSerializer):
         fields = ['id','classroom_name', 'classroom_number', 'flat', 'korpus','school']
         read_only_fields = ['school']
 
+
 class ClassSerializer(serializers.ModelSerializer):
-    classroom = serializers.PrimaryKeyRelatedField(
-        queryset=Classrooms.objects.all(),
-        write_only=True
-    )
+    classroom = serializers.PrimaryKeyRelatedField(queryset=Classrooms.objects.all())
+    class_teacher = serializers.PrimaryKeyRelatedField(queryset=Teacher.objects.all())
 
     class Meta:
         model = Class
-        fields = ['id', 'class_name', 'class_number','language', 'classroom', 'class_teacher', 'osnova_plan', 'osnova_smena', 'dopurok_plan', 'dopurok_smena', 'school']
+        fields = ['id', 'class_name', 'class_number', 'language', 'classroom', 'class_teacher', 'osnova_plan', 'osnova_smena', 'dopurok_plan', 'dopurok_smena', 'school']
         read_only_fields = ['school']
 
     def to_representation(self, instance):
-        representation = super(ClassSerializer, self).to_representation(instance)
-        
-        if 'classroom' in representation:
-            classroom_id = representation['classroom']
-            if classroom_id:
-                try:
-                    classroom_instance = Classrooms.objects.get(id=classroom_id)
-                    representation['classroom'] = str(classroom_instance)
-                except Classrooms.DoesNotExist:
-                    pass
-        
+        representation = super().to_representation(instance)
+        representation['classroom'] = AvailableClassRoomSerializer(instance.classroom).data
+        representation['class_teacher'] = AvailableTeacherSerializer(instance.class_teacher).data
         return representation
 
 
@@ -76,7 +67,7 @@ class SubjectSerializer(serializers.ModelSerializer):
 class schoolPasportApiSerializer(serializers.ModelSerializer):
     class Meta:
         model = schoolPasport
-        fields = ['id','school_address','established', 'amount_of_children','ul_sany','kiz_sany','school_lang','status','vmestimost','dayarlyk_class_number','dayarlyk_student_number','number_of_students','number_of_classes','number_of_1_4_students','number_of_1_4_classes','number_of_5_9_students','number_of_5_9_classes','number_of_10_11_students','number_of_10_11_classes','amount_of_family','amount_of_parents','all_pedagog_number','pedagog_sheber','pedagog_zertteushy','pedagog_sarapshy','pedagog_moderator','pedagog','pedagog_stazher','pedagog_zhogary','pedagog_1sanat','pedagog_2sanat','pedagog_sanat_zhok','school_history','school']
+        fields = ['id','school_address', 'photo','established', 'amount_of_children','ul_sany','kiz_sany','school_lang','status','vmestimost','dayarlyk_class_number','dayarlyk_student_number','number_of_students','number_of_classes','number_of_1_4_students','number_of_1_4_classes','number_of_5_9_students','number_of_5_9_classes','number_of_10_11_students','number_of_10_11_classes','amount_of_family','amount_of_parents','all_pedagog_number','pedagog_sheber','pedagog_zertteushy','pedagog_sarapshy','pedagog_moderator','pedagog','pedagog_stazher','pedagog_zhogary','pedagog_1sanat','pedagog_2sanat','pedagog_sanat_zhok','school_history','school']
         read_only_fields = ['school']
 
 class School_AdministrationSerializer(serializers.ModelSerializer):
@@ -104,17 +95,17 @@ class AvailableRingSerializer(serializers.ModelSerializer):
 class AvailableSubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject
-        fields = ['id', 'full_name']
+        fields = ['id', 'full_name','type']
 
 class AvailableClassRoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Classrooms
-        fields = ['id', 'classroom_name', 'classroom_number']
+        fields = ['id', 'classroom_name','classroom_number']
 
 class AvailableClassesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Class
-        fields = ['id', 'class_name']
+        fields = ['id', 'class_name', 'class_number']
 
 class Sport_SuccessSerializer(serializers.ModelSerializer):
     class_id = serializers.PrimaryKeyRelatedField(
@@ -133,7 +124,7 @@ class Sport_SuccessSerializer(serializers.ModelSerializer):
 
     def get_classl(self, obj):
         return str(obj.classl) if obj.classl else None
-    
+
     def create(self, validated_data):
         class_id = validated_data.pop('class_id', None)
         sport_succes = Sport_Success.objects.create(**validated_data)
@@ -141,7 +132,7 @@ class Sport_SuccessSerializer(serializers.ModelSerializer):
             try:
                 class_instance = Class.objects.get(id=class_id)
                 sport_succes.classl = class_instance
-                sport_succes.save() 
+                sport_succes.save()
             except Class.DoesNotExist:
                 pass
         return sport_succes
@@ -163,7 +154,7 @@ class Oner_SuccessSerializer(serializers.ModelSerializer):
 
     def get_classl(self, obj):
         return str(obj.classl) if obj.classl else None
-    
+
     def create(self, validated_data):
         class_id = validated_data.pop('class_id', None)
 
@@ -198,7 +189,7 @@ class PandikOlimpiada_SuccessSerializer(serializers.ModelSerializer):
 
     def get_classl(self, obj):
         return str(obj.classl) if obj.classl else None
-    
+
     def create(self, validated_data):
         class_id = validated_data.pop('class_id', None)
 
@@ -332,7 +323,7 @@ class DopUrokSerializer(serializers.ModelSerializer):
         schedule.save()
 
         return schedule
-    
+
     def update(self, instance, validated_data):
         instance.week_day = validated_data.get('week_day', instance.week_day)
 
@@ -450,7 +441,7 @@ class DopUrokSerializer(serializers.ModelSerializer):
                 representation['typez'] = Extra_LessonSerializer(typez_instance).data
             except Extra_Lessons.DoesNotExist:
                 pass
-        
+
         del representation['teacher_id']
         del representation['ring_id']
         del representation['classl_id']
@@ -462,6 +453,7 @@ class DopUrokSerializer(serializers.ModelSerializer):
         del representation['typez_id']
 
         return representation
+
 
 class DopUrokRingSerializer(serializers.ModelSerializer):
     class Meta:
@@ -481,7 +473,8 @@ class YearField(serializers.Field):
         except serializers.ValidationError:
             raise serializers.ValidationError("Invalid year format")
 
-class JobHistorySerializer(serializers.ModelSerializer):
+
+class JobHistoryReadSerializer(serializers.ModelSerializer):
     start_date = YearField()
     end_date = YearField()
 
@@ -489,20 +482,45 @@ class JobHistorySerializer(serializers.ModelSerializer):
         model = JobHistory
         fields = ['start_date', 'end_date', 'job_characteristic']
 
-class SpecialityHistorySerializer(serializers.ModelSerializer):
+
+class JobHistoryWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobHistory
+        fields = ['start_date', 'end_date', 'job_characteristic']
+
+
+class SpecialityHistoryReadSerializer(serializers.ModelSerializer):
     end_date = YearField()
 
     class Meta:
         model = SpecialityHistory
         fields = ['end_date', 'speciality_university', 'mamandygy', 'degree']
 
-class TeacherSerializer(serializers.ModelSerializer):
-    job_history = JobHistorySerializer(many=True, read_only=True)
-    speciality_history = SpecialityHistorySerializer(many=True, read_only=True)
+
+class SpecialityHistoryWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SpecialityHistory
+        fields = ['end_date', 'speciality_university', 'mamandygy', 'degree']
+
+
+
+class TeacherReadSerializer(serializers.ModelSerializer):
+    job_history = JobHistoryReadSerializer(many=True, read_only=True, source='jobhistory_set')
+    speciality_history = SpecialityHistoryReadSerializer(many=True, read_only=True, source='specialityhistory_set')
 
     class Meta:
         model = Teacher
         fields = ['id', 'full_name', 'photo3x4', 'subject', 'pedagog', 'job_history', 'speciality_history', 'school']
+        read_only_fields = ['school']
+
+
+class TeacherWriteSerializer(serializers.ModelSerializer):
+    job_history = JobHistoryWriteSerializer(many=True, required=False)
+    speciality_history = SpecialityHistoryWriteSerializer(many=True, required=False)
+
+    class Meta:
+        model = Teacher
+        fields = ['id', 'full_name', 'photo3x4', 'subject', 'pedagog', 'school', 'job_history', 'speciality_history']
         read_only_fields = ['school']
 
     def create(self, validated_data):
@@ -539,6 +557,17 @@ class TeacherSerializer(serializers.ModelSerializer):
             SpecialityHistory.objects.create(teacher=instance, **speciality_data)
 
         return instance
+    
+    def to_representation(self, instance):
+        representation = super(TeacherWriteSerializer, self).to_representation(instance)
+        for job_history_entry in representation.get('job_history', []):
+            job_history_entry['start_date'] = job_history_entry['start_date'].year if job_history_entry['start_date'] else None
+            job_history_entry['end_date'] = job_history_entry['end_date'].year if job_history_entry['end_date'] else None
+
+        for speciality_history_entry in representation.get('speciality_history', []):
+            speciality_history_entry['end_date'] = speciality_history_entry['end_date'].year if speciality_history_entry['end_date'] else None
+
+        return representation
 
 class TeacherWorkloadSerializer(serializers.ModelSerializer):
     class Meta:
@@ -548,13 +577,40 @@ class TeacherWorkloadSerializer(serializers.ModelSerializer):
 # Kruzhok
 # --------------------------------------------------------------------------------------------
 
-class LessonSerializer(serializers.ModelSerializer):
+class LessonReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
         fields = ['week_day', 'start_end_time']
 
-class KruzhokSerializer(serializers.ModelSerializer):
-    lessons = LessonSerializer(many=True)
+class LessonWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Lesson
+        fields = ['week_day', 'start_end_time']
+
+class KruzhokReadSerializer(serializers.ModelSerializer):
+    teacher = AvailableTeacherSerializer(read_only=True)
+    lessons = LessonReadSerializer(many=True, read_only=True)  # Используйте LessonReadSerializer
+
+    class Meta:
+        model = Kruzhok
+        fields = ['id', 'kruzhok_name', 'school', 'teacher', 'photo', 'purpose', 'lessons']
+        read_only_fields = ['school']
+
+    def to_representation(self, instance):
+        representation = super(KruzhokReadSerializer, self).to_representation(instance)
+        
+        teacher_data = AvailableTeacherSerializer(instance.teacher).data
+        representation['teacher'] = {
+            'id': teacher_data.get('id'),
+            'full_name': teacher_data.get('full_name')
+        }
+
+        representation['lessons'] = LessonReadSerializer(instance.lessons.all(), many=True).data
+
+        return representation
+
+class KruzhokWriteSerializer(serializers.ModelSerializer):
+    lessons = LessonWriteSerializer(many=True, write_only=True)
     teacher_id = serializers.PrimaryKeyRelatedField(
         source='teacher',
         queryset=Teacher.objects.all(),
@@ -576,9 +632,12 @@ class KruzhokSerializer(serializers.ModelSerializer):
         kruzhok = Kruzhok.objects.create(**validated_data)
 
         if teacher_id:
-            teacher = Teacher.objects.get(id=teacher_id)
-            kruzhok.teacher = teacher
-            kruzhok.save()
+            try:
+                teacher = Teacher.objects.get(id=teacher_id)
+                kruzhok.teacher = teacher
+                kruzhok.save()
+            except Teacher.DoesNotExist:
+                pass
 
         if photo:
             kruzhok.photo = photo
@@ -616,40 +675,37 @@ class KruzhokSerializer(serializers.ModelSerializer):
 
         return instance
 
-    def to_representation(self, instance):
-        representation = super(KruzhokSerializer, self).to_representation(instance)
-        teacher_data = AvailableTeacherSerializer(instance.teacher).data
-        representation['teacher'] = teacher_data
-        lessons_data = LessonSerializer(instance.lessons.all(), many=True).data
-        representation['lessons'] = lessons_data
-        return representation
-    
-    def delete(self):
-        instance = self.instance
-        instance.delete()
-        return instance
-
 class PhotoforNews(serializers.ModelSerializer):
     class Meta:
         model = PhotoforNews
         fields = ['image']
 
 class NewsSerializer(serializers.ModelSerializer):
-    photos = serializers.SerializerMethodField()
+    photos = PhotoforNews(many=True, read_only=True)
 
     class Meta:
         model = News
         fields = ['id', 'date', 'text', 'type', 'photos', 'school']
         read_only_fields = ['school']
 
-    def get_photos(self, obj):
-        photos_queryset = obj.photos.all()
-        return [self.context['request'].build_absolute_uri(photo.image.url) if photo.image else None for photo in photos_queryset]
+    def create(self, validated_data):
+        photos_data = self.context.get('request').data.get('photos', [])
+        news_instance = News.objects.create(**validated_data)
+
+        for photo_data in photos_data:
+            PhotoforNews.objects.create(news=news_instance, **photo_data)
+
+        return news_instance
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['photos'] = [self.context['request'].build_absolute_uri(photo.image.url) if photo.image else None for photo in instance.photos.all()]
+        representation['photos'] = self.get_absolute_photo_urls(instance.photos.all())
         return representation
+
+    def get_absolute_photo_urls(self, photos_queryset):
+        request = self.context['request']
+        return [request.build_absolute_uri(photo.image.url) if photo.image else None for photo in photos_queryset]
+
 
 class ScheduleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -738,7 +794,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
         schedule.save()
 
         return schedule
-    
+
     def update(self, instance, validated_data):
         instance.week_day = validated_data.get('week_day', instance.week_day)
 
@@ -856,7 +912,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
                 representation['typez'] = Extra_LessonSerializer(typez_instance).data
             except Extra_Lessons.DoesNotExist:
                 pass
-        
+
         del representation['teacher_id']
         del representation['ring_id']
         del representation['classl_id']

@@ -122,7 +122,7 @@ class Class(models.Model):
     class_name = models.CharField(max_length=150)
     school = models.ForeignKey('School', on_delete=models.CASCADE, null=True)
     classroom = models.ForeignKey('Classrooms', on_delete=models.CASCADE, null=True)
-    class_teacher = models.OneToOneField(Teacher, on_delete=models.SET_NULL, null=True, blank=True, related_name='class_teacher')
+    class_teacher = models.ForeignKey(Teacher, on_delete=models.SET_NULL, null=True, blank=True, related_name='class_teacher')
     KZ = 'KZ'
     RU = 'RU'
     lang_choices = [
@@ -547,10 +547,10 @@ class Extra_Lessons(models.Model):
 #             History
 
 class JobHistory(models.Model):
-    teacher = models.ForeignKey('Teacher', on_delete=models.CASCADE, null=True)
+    teacher = models.ForeignKey('Teacher', on_delete=models.CASCADE, null=False)
     start_date = models.DateField()
-    end_date = models.DateField(max_length=200)
-    job_characteristic = models.TextField(default='')
+    end_date = models.DateField()
+    job_characteristic = models.TextField()
 
     class Meta:
         verbose_name_plural = "Job History"
@@ -560,7 +560,7 @@ class JobHistory(models.Model):
 
 
 class SpecialityHistory(models.Model):
-    teacher = models.ForeignKey('Teacher', on_delete=models.CASCADE, null=True)
+    teacher = models.ForeignKey('Teacher', on_delete=models.CASCADE, null=False)
     end_date = models.DateField()
     speciality_university = models.TextField()
     srednee = "Среднее"
